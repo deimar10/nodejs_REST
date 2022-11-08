@@ -5,7 +5,7 @@ const posts = require('../services/posts');
 /* GET posts. */
 router.get('/', async  function(req, res, next){
     try {
-        res.json(await posts.getMultiple(req.query.page));
+        res.json(await posts.getMultiple());
     } catch (err) {
         console.error(`Error while getting programming languages`, err.message);
         next(err);

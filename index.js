@@ -21,5 +21,5 @@ app.use((err, req, res, next) => {
 });
 
 app.listen(port, () => {
-    console.log(`Example app lostening at http://localhost:${port}`);
+    console.log(`Server started at http://localhost:${port}`);
 })
