@@ -5,10 +5,14 @@ const postsRouter = require("./routes/posts");
 const cors = require("cors");
 const http = require("http");
 const { Server } = require('socket.io');
+const swaggerUi = require('swagger-ui-express');
+const swaggerDocument = require('./swagger.json');
 
 const server = http.createServer(app)
 
 app.use(cors());
+
+app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 const io = new Server(server, {
     cors: {
