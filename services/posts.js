@@ -35,12 +35,12 @@ async function update(id, posts) {
 
     if (result.affectedRows) {
         return {
-            id: id,
+            id: parseInt(id, 10),
             title: posts.title,
             body: posts.body
         }
     }
-    return {message};
+    return status(404).send({message});
 }
 
 async function remove(id) {
@@ -54,7 +54,7 @@ async function remove(id) {
         return {}
     }
 
-    return {message};
+    return status(404).send({message});
 }
 
 module.exports = {

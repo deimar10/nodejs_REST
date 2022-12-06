@@ -121,8 +121,8 @@
             },
             "description": "Successful response."
           },
-          "400": {
-            "description": "\"message\": \"Error in updating posts\""
+          "404": {
+            "description": "\"message\": \"Post not found\"\r\n\r\n  \r\n  \r\n  \r\n  "
           }
         },
         "operationId": "updatepost",
@@ -152,8 +152,8 @@
             },
             "description": "Successful response."
           },
-          "400": {
-            "description": "\"message\": \"Error in deleting posts\""
+          "404": {
+            "description": "\"message\": \"Post not found\"\r\n"
           }
         },
         "operationId": "deletepost",
