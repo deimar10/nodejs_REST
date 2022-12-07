@@ -3,6 +3,8 @@ const router = express.Router();
 const posts = require('../services/posts');
 const fs = require('fs');
 const readline = require('readline');
+const jwt = require('jsonwebtoken');
+require('dotenv').config();
 
 router.get('/logs', async (req, res) => {
     const lines = [];
@@ -40,8 +42,32 @@ function log(req, res, next) {
     next();
 }
 
+router.get('/token', (req, res) => {
+    // Authenticate
+    let privateKey = process.env.JWT_SECRET_KEY;
+    let token = jwt.sign({ "body" : "secret" },
+        privateKey, { algorithm: 'HS256'});
+    res.send(token);
+})
+
+function authenticateToken(req, res, next) {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
+    if (token !== null) {
+        jwt.verify(token, process.env.JWT_SECRET_KEY, (err) => {
+            if (err) {res.status(401).json({ error: "Not authorized" });
+                throw new Error("Not authorized");
+            }
+            return next();
+        });
+    } else {
+        res.status(401).json({ error: "Please include a token in request header"});
+        throw new Error("Not authorized");
+    }
+}
+
 /* GET posts. */
-router.get('/', async  function(req, res, next){
+router.get('/', authenticateToken, async function(req, res, next){
     try {
         res.json(await posts.getMultiple());
     } catch (err) {
@@ -53,7 +79,7 @@ router.get('/', async  function(req, res, next){
 /* POST posts */
 router.post('/', log, async function(req, res, next) {
     try {
-        res.json(await posts.create(req.body));
+        res.status(201).json(await posts.create(req.body));
     } catch (err) {
         console.error(`Error while creating posts`, err.message);
         next(err);
