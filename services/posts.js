@@ -27,7 +27,7 @@ async function create(posts){
     return {message};
 }
 
-async function update(id, posts) {
+async function update(id, posts, res) {
     const result = await db.query(
         `UPDATE posts SET title="${posts.title}", body="${posts.body}" WHERE id=${id}`
     );
@@ -40,10 +40,10 @@ async function update(id, posts) {
             body: posts.body
         }
     }
-    return status(404).send({message});
+    return res.status(400).send({message})
 }
 
-async function remove(id) {
+async function remove(id, res) {
     const result = await db.query(
         `DELETE FROM posts WHERE id=${id}`
     );
@@ -54,7 +54,7 @@ async function remove(id) {
         return {}
     }
 
-    return status(404).send({message});
+    return res.status(404).send({message});
 }
 
 module.exports = {

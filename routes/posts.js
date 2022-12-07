@@ -53,21 +53,21 @@ router.get('/token', (req, res) => {
 function authenticateToken(req, res, next) {
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1];
-    if (token !== null) {
+    if (typeof token !== "undefined") {
         jwt.verify(token, process.env.JWT_SECRET_KEY, (err) => {
             if (err) {res.status(401).json({ error: "Not authorized" });
-                throw new Error("Not authorized");
+               // throw new Error("Not authorized");
             }
             return next();
         });
     } else {
         res.status(401).json({ error: "Please include a token in request header"});
-        throw new Error("Not authorized");
+       // throw new Error("Not authorized");
     }
 }
 
 /* GET posts. */
-router.get('/', authenticateToken, async function(req, res, next){
+router.get('/', async function(req, res, next){
     try {
         res.json(await posts.getMultiple());
     } catch (err) {
@@ -77,7 +77,7 @@ router.get('/', authenticateToken, async function(req, res, next){
 });
 
 /* POST posts */
-router.post('/', log, async function(req, res, next) {
+router.post('/', log, authenticateToken, async function(req, res, next) {
     try {
         res.status(201).json(await posts.create(req.body));
     } catch (err) {
@@ -87,9 +87,9 @@ router.post('/', log, async function(req, res, next) {
 });
 
 /* PUT posts */
-router.put('/:id', log, async function(req, res, next) {
+router.put('/:id', log, authenticateToken, async function(req, res, next) {
     try {
-        res.json(await posts.update(req.params.id, req.body));
+        res.json(await posts.update(req.params.id, req.body, res));
     } catch (err) {
         res.status(404).send({message:"Post not found"});
         console.error(`Error while updating posts`, err.message);
@@ -98,9 +98,9 @@ router.put('/:id', log, async function(req, res, next) {
 });
 
 /* DELETE posts */
-router.delete('/:id', log, async function(req, res, next) {
+router.delete('/:id', log, authenticateToken, async function(req, res, next) {
     try {
-        res.status(204).json(await posts.remove(req.params.id));
+        res.status(204).json(await posts.remove(req.params.id, res));
     } catch (err) {
         res.status(404).send({message:"Post not found"});
         console.error(`Error while deleting posts`, err.message);
