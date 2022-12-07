@@ -6,7 +6,8 @@ const cors = require("cors");
 const http = require("http");
 const { Server } = require('socket.io');
 const swaggerUi = require('swagger-ui-express');
-const swaggerDocument = require('./swagger.json');
+const yamlJs = require('yamljs');
+const swaggerDocument = yamlJs.load('./swagger.yaml');
 
 const server = http.createServer(app)
 

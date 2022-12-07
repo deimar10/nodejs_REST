@@ -1,0 +1,164 @@
+openapi: 3.0.2
+info:
+  title: posts
+  version: 3.0.0
+paths:
+  /posts:
+    summary: Path used to manage the list of posts.
+    description: >-
+      The REST endpoint/path used to list and create zero or more `post` entities.  This path contains a
+      `GET` and `POST` operation to perform the list and create tasks, respectively.
+    get:
+      tags:
+        - Posts
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/post'
+          description: Successful response - returns an array of `post` entities.
+      operationId: getposts
+      summary: List All posts
+      description: Gets a list of all `post` entities.
+    post:
+      requestBody:
+        description: A new `post` to be created.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/post'
+            examples:
+              post:
+                value:
+                  title: Tere
+                  body: Lorem10
+        required: true
+      tags:
+        - Posts
+      responses:
+        '201':
+          content:
+            application/json:
+              examples:
+                post:
+                  value:
+                    id: 10
+                    title: Tere
+                    body: Lorem10
+          description: Successful response.
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+          description: Error. Bad request
+      operationId: createpost
+      summary: Create a post
+      description: Creates a new instance of a `post`.
+  '/posts/{postId}':
+    summary: Path used to manage a single post.
+    description: >-
+      The REST endpoint/path used to get, update, and delete single instances of an `post`.  This path
+      contains `PUT`, and `DELETE` operations used to perform the get, update, and delete tasks,
+      respectively.
+    put:
+      tags:
+        - Posts
+      parameters:
+        -
+          name: postId
+          description: A unique identifier for a `post`.
+          schema:
+            type: integer
+          in: path
+          required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              examples:
+                post:
+                  value:
+                    id: 35
+                    title: tere10
+                    body: lorem ipsum10
+          description: Successful response.
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error404'
+          description: Post not found
+      operationId: updatepost
+      summary: Update a post
+      description: Updates an existing `post`.
+    delete:
+      requestBody: {}
+      tags:
+        - Posts
+      parameters:
+        -
+          name: postId
+          description: A unique identifier for a `post`.
+          schema:
+            type: integer
+          in: path
+          required: true
+      responses:
+        '200':
+          content:
+            application/json: {}
+          description: Successful response.
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error404'
+          description: "\"message\": \"Post not found\"\r\n"
+      operationId: deletepost
+      summary: Delete a post
+      description: Deletes an existing `post`.
+    parameters:
+      -
+        name: postId
+        description: A unique identifier for a `post`.
+        schema:
+          type: string
+        in: path
+        required: true
+components:
+  schemas:
+    post:
+      title: Root Type for post
+      description: ''
+      type: object
+      properties:
+        title:
+          type: string
+        body:
+          type: string
+      example:
+        id: 15
+        title: Tere
+        body: Lorem ipsum
+    error404:
+      title: Root Type for error404
+      description: ''
+      type: object
+      properties:
+        message:
+          type: string
+      example:
+        message: Post not found
+    error:
+      title: Root Type for error
+      description: ''
+      type: object
+      properties:
+        message:
+          type: string
+      example:
+        message: Some text
