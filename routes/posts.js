@@ -34,16 +34,16 @@ function log(req, res, next) {
     let dateDay = date_ob.getDate();
     let dateMonth = date_ob.getMonth() + 1;
     let dateYear = date_ob.getFullYear();
-    let time = date_ob.getHours() + ":" + date_ob.getMinutes() + ":" + date_ob.getSeconds();
+    let time = date_ob.getHours().toString().padStart(2,0) + ":" + date_ob.getMinutes().toString().padStart(2,0) + ":" + date_ob.getSeconds().toString().padStart(2,0);
 
     const timeStamp = dateDay + "-" + dateMonth + "-" + dateYear + " " + time;
+    console.log(time);
 
     token = req.headers.authorization;
     let [header, payload, signature] = token.split(".");
 
     const data = JSON.stringify(req.body);
     let extraData = data.replace(/[{\"\",}]/g, " ");
-    console.log(extraData);
 
     fs.appendFile('log.txt', timeStamp + ',' + req.originalUrl + ',' + req.method + ',' + signature + ',' + extraData +  '\r\n', function(err) {
         if (err) throw err;
@@ -66,13 +66,13 @@ function authenticateToken(req, res, next) {
     if (typeof token !== "undefined") {
         jwt.verify(token, process.env.JWT_SECRET_KEY, (err) => {
             if (err) {res.status(401).json({ error: "Not authorized" });
-               // throw new Error("Not authorized");
+                throw new Error("Not authorized");
             }
             return next();
         });
     } else {
         res.status(401).json({ error: "Please include a token in request header"});
-       // throw new Error("Not authorized");
+         throw new Error("Not authorized");
     }
 }
 
