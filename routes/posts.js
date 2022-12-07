@@ -21,6 +21,7 @@ router.get('/logs', async (req, res) => {
             originalUrl: fields[1],
             method: fields[2],
             id: fields[3],
+            changes: fields[4],
         });
     }
     return res.send(lines);
@@ -40,7 +41,11 @@ function log(req, res, next) {
     token = req.headers.authorization;
     let [header, payload, signature] = token.split(".");
 
-    fs.appendFile('log.txt', timeStamp + ',' + req.originalUrl + ',' + req.method + ',' + signature + '\r\n', function(err) {
+    const data = JSON.stringify(req.body);
+    let extraData = data.replace(/[{\"\",}]/g, " ");
+    console.log(extraData);
+
+    fs.appendFile('log.txt', timeStamp + ',' + req.originalUrl + ',' + req.method + ',' + signature + ',' + extraData +  '\r\n', function(err) {
         if (err) throw err;
     });
     next();
