@@ -20,6 +20,7 @@ router.get('/logs', async (req, res) => {
             timeStamp: fields[0],
             originalUrl: fields[1],
             method: fields[2],
+            id: fields[3],
         });
     }
     return res.send(lines);
@@ -36,7 +37,10 @@ function log(req, res, next) {
 
     const timeStamp = dateDay + "-" + dateMonth + "-" + dateYear + " " + time;
 
-    fs.appendFile('log.txt', timeStamp + ',' + req.originalUrl + ',' + req.method + '\r\n', function(err) {
+    token = req.headers.authorization;
+    let [header, payload, signature] = token.split(".");
+
+    fs.appendFile('log.txt', timeStamp + ',' + req.originalUrl + ',' + req.method + ',' + signature + '\r\n', function(err) {
         if (err) throw err;
     });
     next();
@@ -53,6 +57,7 @@ router.get('/token', (req, res) => {
 function authenticateToken(req, res, next) {
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1];
+
     if (typeof token !== "undefined") {
         jwt.verify(token, process.env.JWT_SECRET_KEY, (err) => {
             if (err) {res.status(401).json({ error: "Not authorized" });
