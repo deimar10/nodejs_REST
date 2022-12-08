@@ -37,7 +37,6 @@ function log(req, res, next) {
     let time = date_ob.getHours().toString().padStart(2,0) + ":" + date_ob.getMinutes().toString().padStart(2,0) + ":" + date_ob.getSeconds().toString().padStart(2,0);
 
     const timeStamp = dateDay + "-" + dateMonth + "-" + dateYear + " " + time;
-    console.log(time);
 
     token = req.headers.authorization;
     let [header, payload, signature] = token.split(".");
@@ -99,7 +98,7 @@ router.post('/', log, authenticateToken, async function(req, res, next) {
 /* PUT posts */
 router.put('/:id', log, authenticateToken, async function(req, res, next) {
     try {
-        res.json(await posts.update(req.params.id, req.body, res));
+        res.json(await posts.update(req.params.id, req.body, res, req));
     } catch (err) {
         res.status(404).send({message:"Post not found"});
         console.error(`Error while updating posts`, err.message);
@@ -110,7 +109,7 @@ router.put('/:id', log, authenticateToken, async function(req, res, next) {
 /* DELETE posts */
 router.delete('/:id', log, authenticateToken, async function(req, res, next) {
     try {
-        res.status(204).json(await posts.remove(req.params.id, res));
+        res.status(204).json(await posts.remove(req.params.id, res, req));
     } catch (err) {
         res.status(404).send({message:"Post not found"});
         console.error(`Error while deleting posts`, err.message);
