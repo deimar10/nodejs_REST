@@ -6,6 +6,7 @@ const readline = require('readline');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
+/* Endpoint for seeing logs */
 router.get('/logs', async (req, res) => {
     const lines = [];
     const lineReader = readline.createInterface({
@@ -27,14 +28,15 @@ router.get('/logs', async (req, res) => {
     return res.send(lines);
 })
 
+/* function for logs */
 function log(req, res, next) {
     const currentDate = new Date().toISOString();
-    let date_ob = new Date(currentDate);
+    let dateObject = new Date(currentDate);
 
-    let dateDay = date_ob.getDate();
-    let dateMonth = date_ob.getMonth() + 1;
-    let dateYear = date_ob.getFullYear();
-    let time = date_ob.getHours().toString().padStart(2,0) + ":" + date_ob.getMinutes().toString().padStart(2,0) + ":" + date_ob.getSeconds().toString().padStart(2,0);
+    let dateDay = dateObject.getDate();
+    let dateMonth = dateObject.getMonth() + 1;
+    let dateYear = dateObject.getFullYear();
+    let time = dateObject.getHours().toString().padStart(2,0) + ":" + dateObject.getMinutes().toString().padStart(2,0) + ":" + dateObject.getSeconds().toString().padStart(2,0);
 
     const timeStamp = dateDay + "-" + dateMonth + "-" + dateYear + " " + time;
 
@@ -42,7 +44,7 @@ function log(req, res, next) {
     let [header, payload, signature] = token.split(".");
 
     const data = JSON.stringify(req.body);
-    let extraData = data.replace(/[{\"\",}]/g, " ");
+    let extraData = data.replace(/[{\"\",}]+/g, " ");
 
     fs.appendFile('log.txt', timeStamp + ',' + req.originalUrl + ',' + req.method + ',' + signature + ',' + extraData +  '\r\n', function(err) {
         if (err) throw err;
@@ -50,6 +52,7 @@ function log(req, res, next) {
     next();
 }
 
+/* Endpoint for geting token */
 router.get('/token', (req, res) => {
     // Authenticate
     let privateKey = process.env.JWT_SECRET_KEY;
@@ -58,6 +61,7 @@ router.get('/token', (req, res) => {
     res.send(token);
 })
 
+/* Middleware */
 function authenticateToken(req, res, next) {
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1];

@@ -12,7 +12,7 @@ paths:
       tags:
         - Posts
       responses:
-        '201':
+        '200':
           content:
             application/json:
               schema:
@@ -55,6 +55,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/error'
           description: Error. Bad request
+      security:
+        -
+          auth: []
       operationId: createpost
       summary: Create a post
       description: Creates a new instance of a `post`.
@@ -65,6 +68,17 @@ paths:
       contains `PUT`, and `DELETE` operations used to perform the get, update, and delete tasks,
       respectively.
     put:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/post'
+            examples:
+              posts:
+                value:
+                  title: jurgen
+                  body: stopp
+        required: true
       tags:
         - Posts
       parameters:
@@ -82,7 +96,7 @@ paths:
               examples:
                 post:
                   value:
-                    id: 35
+                    id: 82
                     title: tere10
                     body: lorem ipsum10
           description: Successful response.
@@ -92,11 +106,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/error404'
           description: Post not found
+      security:
+        -
+          auth: []
       operationId: updatepost
       summary: Update a post
       description: Updates an existing `post`.
     delete:
-      requestBody: {}
       tags:
         - Posts
       parameters:
@@ -118,6 +134,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/error404'
           description: "\"message\": \"Post not found\"\r\n"
+      security:
+        -
+          auth: []
       operationId: deletepost
       summary: Delete a post
       description: Deletes an existing `post`.
@@ -129,6 +148,23 @@ paths:
           type: string
         in: path
         required: true
+  /posts/logs:
+    get:
+      tags:
+        - Logs
+      responses:
+        '200':
+          content:
+            application/json:
+              examples:
+                log:
+                  value:
+                    -
+                      timeStamp: '7-12-2022 10:54:22'
+                      originalUrl: /posts
+                      method: POST
+                      id: snijCls5WlE4VKM-7g-4yw5mGZN8WI6wnroXcHsSzp0
+          description: 'Server returns logs '
 components:
   schemas:
     post:
@@ -162,3 +198,7 @@ components:
           type: string
       example:
         message: Some text
+  securitySchemes:
+    auth:
+      scheme: bearer
+      type: http

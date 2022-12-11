@@ -32,9 +32,8 @@ async function create(posts){
 async function update(id, posts, res, req) {
     await userAuthorize(req, res)
     const result = await db.query(
-        `UPDATE posts SET title="${posts.title}", body="${posts.body}" WHERE id=${id}`
+        `UPDATE posts SET title='${posts.title}', body='${posts.body}' WHERE id=${id}`
     );
-    let message = 'Error in updating posts';
 
     if (result.affectedRows) {
         return {
@@ -43,8 +42,9 @@ async function update(id, posts, res, req) {
             body: posts.body
         }
     }
-    return res.status(400).send({message})
+    return res.status(400).send({message: 'Error in updating posts'})
 }
+
 
 async function remove(id, res, req) {
     await userAuthorize(req, res)
