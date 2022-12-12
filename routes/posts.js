@@ -22,14 +22,16 @@ router.get('/logs', async (req, res) => {
             originalUrl: fields[1],
             method: fields[2],
             id: fields[3],
-            changes: fields[4],
+            new: fields[4],
+            original: fields[5]
         });
     }
     return res.send(lines);
 })
 
 /* function for logs */
-function log(req, res, next) {
+async function log(req, res, next) {
+
     const currentDate = new Date().toISOString();
     let dateObject = new Date(currentDate);
 
@@ -46,7 +48,14 @@ function log(req, res, next) {
     const data = JSON.stringify(req.body);
     let extraData = data.replace(/[{\"\",}]+/g, " ");
 
-    fs.appendFile('log.txt', timeStamp + ',' + req.originalUrl + ',' + req.method + ',' + signature + ',' + extraData +  '\r\n', function(err) {
+    let originalState;
+    if (req.method === 'PUT') {
+         originalState = JSON.stringify((await posts.getOnePost(req.params.id))).replace(/[{\"\",}]+/g, " ");
+    } else {
+         originalState = " ";
+    }
+
+    fs.appendFile('log.txt', timeStamp + ',' + req.originalUrl + ',' + req.method + ',' + signature + ',' + 'New:' + extraData + ',' + 'Previous:' + originalState + '\r\n', function(err) {
         if (err) throw err;
     });
     next();
@@ -98,6 +107,7 @@ router.post('/', log, authenticateToken, async function(req, res, next) {
         next(err);
     }
 });
+
 
 /* PUT posts */
 router.put('/:id', log, authenticateToken, async function(req, res, next) {

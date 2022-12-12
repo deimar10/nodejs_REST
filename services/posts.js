@@ -5,7 +5,6 @@ async function getMultiple() {
     const rows = await db.query(
         `SELECT id, title, body FROM posts`
     );
-
     return helper.emptyOrRows(rows);
 }
 
@@ -70,9 +69,17 @@ async function userAuthorize(req, res) {
     }
 }
 
+async function getOnePost(id) {
+    const result = await db.query(
+        `SELECT * FROM posts WHERE id=${id}`
+    );
+    return { title: result[0].title, body: result[0].body}
+}
+
 module.exports = {
     getMultiple,
     create,
     update,
     remove,
+    getOnePost
 }
