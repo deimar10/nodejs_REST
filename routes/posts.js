@@ -48,17 +48,35 @@ async function log(req, res, next) {
     const data = JSON.stringify(req.body);
     let extraData = data.replace(/[{\"\",}]+/g, " ");
 
-    let originalState;
-    if (req.method === 'PUT') {
-         originalState = JSON.stringify((await posts.getOnePost(req.params.id))).replace(/[{\"\",}]+/g, " ");
+    let compare;
+    if(req.method === 'PUT'){
+         compare = JSON.stringify(diff(req.body,(await posts.getOnePost(req.params.id))));
     } else {
-         originalState = " ";
+         compare = " ";
     }
 
-    fs.appendFile('log.txt', timeStamp + ',' + req.originalUrl + ',' + req.method + ',' + signature + ',' + 'New:' + extraData + ',' + 'Previous:' + originalState + '\r\n', function(err) {
+    fs.appendFile('log.txt', timeStamp + ',' + req.originalUrl + ',' + req.method + ',' + signature + ',' + 'New:' + extraData + ',' + 'Diff:' + compare + '\r\n', function(err) {
         if (err) throw err;
     });
     next();
+}
+
+function diff(obj1, obj2) {
+
+    function getUniqueKeys(obj1, obj2) {
+        let keys = Object.keys(obj1).concat(Object.keys(obj2));
+        return keys.filter(function (item, pos) {
+            return keys.indexOf(item) === pos;
+        });
+    }
+
+    let result = {};
+    for (let k of getUniqueKeys(obj1, obj2)) {
+        if (obj1[k] !== obj2[k]) {
+            result[k] = obj2[k];
+        }
+    }
+    return result;
 }
 
 /* Endpoint for geting token */
