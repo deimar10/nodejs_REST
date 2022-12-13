@@ -46,16 +46,15 @@ async function log(req, res, next) {
     let [header, payload, signature] = token.split(".");
 
     const data = JSON.stringify(req.body);
-    let extraData = data.replace(/[{\"\",}]+/g, " ");
 
     let compare;
     if(req.method === 'PUT'){
-         compare = JSON.stringify(diff(req.body,(await posts.getOnePost(req.params.id))));
+         compare = JSON.stringify(diff(req.body,(await posts.getOnePost(req.params.id)))).replace(/[{\"\",}]+/g, " ");
     } else {
          compare = " ";
     }
 
-    fs.appendFile('log.txt', timeStamp + ',' + req.originalUrl + ',' + req.method + ',' + signature + ',' + 'New:' + extraData + ',' + 'Diff:' + compare + '\r\n', function(err) {
+    fs.appendFile('log.txt', timeStamp + ',' + req.originalUrl + ',' + req.method + ',' + signature + ',' + compare + '\r\n', function(err) {
         if (err) throw err;
     });
     next();
@@ -70,13 +69,18 @@ function diff(obj1, obj2) {
         });
     }
 
-    let result = {};
+    let initial = {state: "Old"};
+    let result = {state: "New"};
+
+    let reference = [];
     for (let k of getUniqueKeys(obj1, obj2)) {
         if (obj1[k] !== obj2[k]) {
-            result[k] = obj2[k];
+            initial[k] = obj2[k]
+            result[k] = obj1[k]
         }
     }
-    return result;
+    reference.push(initial, result)
+    return reference;
 }
 
 /* Endpoint for geting token */

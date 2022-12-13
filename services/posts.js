@@ -44,7 +44,6 @@ async function update(id, posts, res, req) {
     return res.status(400).send({message: 'Error in updating posts'})
 }
 
-
 async function remove(id, res, req) {
     await userAuthorize(req, res)
     const result = await db.query(
