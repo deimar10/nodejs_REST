@@ -20,8 +20,8 @@ router.get('/logs', async (req, res) => {
         lines.push({
             timeStamp: fields[0],
             originalUrl: fields[1],
-            method: fields[2],
             id: fields[3],
+            method: fields[2],
             new: fields[4],
             original: fields[5]
         });
@@ -42,10 +42,8 @@ async function log(req, res, next) {
 
     const timeStamp = dateDay + "-" + dateMonth + "-" + dateYear + " " + time;
 
-    token = req.headers.authorization;
+    let token = req.headers.authorization;
     let [header, payload, signature] = token.split(".");
-
-    const data = JSON.stringify(req.body);
 
     let compare;
     if(req.method === 'PUT'){
@@ -54,7 +52,7 @@ async function log(req, res, next) {
          compare = " ";
     }
 
-    fs.appendFile('log.txt', timeStamp + ',' + req.originalUrl + ',' + req.method + ',' + signature + ',' + compare + '\r\n', function(err) {
+    fs.appendFile('log.txt', timeStamp + ',' + req.originalUrl + ',' + req.method  + ',' + signature  + ',' + compare + '\r\n', function(err) {
         if (err) throw err;
     });
     next();
@@ -94,10 +92,10 @@ router.get('/token', (req, res) => {
 
 /* Middleware */
 function authenticateToken(req, res, next) {
-    const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1];
 
-    if (typeof token !== "undefined") {
+    if (req.headers.authorization ) {
+        let token = req.headers.authorization.split(" ")[1];
+
         jwt.verify(token, process.env.JWT_SECRET_KEY, (err) => {
             if (err) {res.status(401).json({ error: "Not authorized" });
                 throw new Error("Not authorized");
@@ -121,7 +119,7 @@ router.get('/', async function(req, res, next){
 });
 
 /* POST posts */
-router.post('/', log, authenticateToken, async function(req, res, next) {
+router.post('/',authenticateToken, log , async function(req, res, next) {
     try {
         res.status(201).json(await posts.create(req.body));
     } catch (err) {
@@ -132,7 +130,7 @@ router.post('/', log, authenticateToken, async function(req, res, next) {
 
 
 /* PUT posts */
-router.put('/:id', log, authenticateToken, async function(req, res, next) {
+router.put('/:id',authenticateToken, log, async function(req, res, next) {
     try {
         res.json(await posts.update(req.params.id, req.body, res, req));
     } catch (err) {

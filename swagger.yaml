@@ -35,6 +35,8 @@ paths:
                 value:
                   title: Tere
                   body: Lorem10
+                  token: >-
+                    eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJib2R5Ijoic2VjcmV0IiwiaWF0IjoxNjcwODUyMjI1fQ.J5sl6JPVaEv7uD1A6BRNv3R0cMo3Jmpv0wkV1CSVn44
         required: true
       tags:
         - Posts
@@ -48,6 +50,8 @@ paths:
                     id: 10
                     title: Tere
                     body: Lorem10
+                    token: >-
+                      eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJib2R5Ijoic2VjcmV0IiwiaWF0IjoxNjcwODUyMjI1fQ.J5sl6JPVaEv7uD1A6BRNv3R0cMo3Jmpv0wkV1CSVn44
           description: Successful response.
         '400':
           content:
@@ -124,9 +128,7 @@ paths:
           in: path
           required: true
       responses:
-        '200':
-          content:
-            application/json: {}
+        '204':
           description: Successful response.
         '404':
           content:
