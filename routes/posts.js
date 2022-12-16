@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const posts = require('../services/posts');
+const postSequelize = require('../services/post.sequelize');
 const fs = require('fs');
 const readline = require('readline');
 const jwt = require('jsonwebtoken');
@@ -47,7 +48,8 @@ async function log(req, res, next) {
 
     let compare;
     if(req.method === 'PUT'){
-         compare = JSON.stringify(diff(req.body,(await posts.getOnePost(req.params.id)))).replace(/[{\"\",}]+/g, " ");
+         //compare = JSON.stringify(diff(req.body,(await posts.getOnePost(req.params.id)))).replace(/[{\"\",}]+/g, " ");
+        compare = JSON.stringify(diff(req.body,(await postSequelize.getOnePost(req.params.id, res)))).replace(/[{\"\",}]+/g, " ");
     } else {
          compare = " ";
     }
@@ -111,7 +113,8 @@ function authenticateToken(req, res, next) {
 /* GET posts. */
 router.get('/', async function(req, res, next){
     try {
-        res.json(await posts.getMultiple());
+        //res.json(await posts.getMultiple());
+        res.json(await postSequelize.getMultiple(req, res));
     } catch (err) {
         console.error(`Error while getting programming languages`, err.message);
         next(err);
@@ -121,7 +124,8 @@ router.get('/', async function(req, res, next){
 /* POST posts */
 router.post('/',authenticateToken, log , async function(req, res, next) {
     try {
-        res.status(201).json(await posts.create(req.body));
+        //res.status(201).json(await posts.create(req.body));
+        res.json(await postSequelize.create(req, res));
     } catch (err) {
         console.error(`Error while creating posts`, err.message);
         next(err);
@@ -132,9 +136,10 @@ router.post('/',authenticateToken, log , async function(req, res, next) {
 /* PUT posts */
 router.put('/:id',authenticateToken, log, async function(req, res, next) {
     try {
-        res.json(await posts.update(req.params.id, req.body, res, req));
+       // res.json(await posts.update(req.params.id, req.body, res, req));
+        res.json(await postSequelize.update(req, res));
     } catch (err) {
-        res.status(404).send({message:"Post not found"});
+        // res.status(404).send({message:"Post not found"});
         console.error(`Error while updating posts`, err.message);
         next(err);
     }
@@ -143,9 +148,10 @@ router.put('/:id',authenticateToken, log, async function(req, res, next) {
 /* DELETE posts */
 router.delete('/:id', log, authenticateToken, async function(req, res, next) {
     try {
-        res.status(204).json(await posts.remove(req.params.id, res, req));
+        // res.status(204).json(await posts.remove(req.params.id, res, req));
+        res.status(204).json(await postSequelize.remove(req, res));
     } catch (err) {
-        res.status(404).send({message:"Post not found"});
+      //  res.status(404).send({message:"Post not found"});
         console.error(`Error while deleting posts`, err.message);
         next(err);
     }
